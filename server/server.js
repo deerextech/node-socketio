@@ -9,7 +9,8 @@ var app = express();
 var server = http.createServer(app);
 var io = socketIO(server);
 
-const {generateMessage} = require('./utils/message');
+const {generateMessage, generateLocationMessage} = require('./utils/message');
+
 // const publicPath = path.join(__dirname, '../public');
 
 io.on('connection', (socket) =>{
@@ -23,14 +24,15 @@ io.on('connection', (socket) =>{
 		console.log('disconnected from browser! D: ')
 	});
 
-	socket.on('createMessage', (message)=>{
+	socket.on('createMessage', (message, callback)=>{
 		console.log('createMessage',message);
 		io.emit('newMessage',  generateMessage(message.from, message.text))
-		// socket.broadcast.emit('newMessage', {
-		// 	from: message.from,
-		// 	text: message.text,
-		// 	createdAt: new Date().getTime()
-		// })
+		
+		callback('this is from server');
+		
+	});
+	socket.on('createLocationMessage', (coords)=>{
+		io.emit('newLocationMessage', generateLocationMessage('admin', coords.latitude, coords.longitude))
 	})
 })
 
